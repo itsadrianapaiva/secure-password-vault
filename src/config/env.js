@@ -5,9 +5,3 @@ module.exports = {
   mongoUri: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,
 };
-
-const express = require('express');
-const app = express();
-app.get('/', (req, res) => {
-  res.send('Hello World');
-});
