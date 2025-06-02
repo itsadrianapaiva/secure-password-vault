@@ -1,9 +1,9 @@
-const js = require('@eslint/js');
-const prettier = require('eslint-plugin-prettier');
-const eslintConfigPrettier = require('eslint-config-prettier');
+import { configs } from '@eslint/js';
+import prettier from 'eslint-plugin-prettier';
+import eslintConfigPrettier from 'eslint-config-prettier';
 
-module.exports = [
-  { ...js.configs.recommended },
+export default [
+  { ...configs.recommended },
   {
     files: ['**/*.js'],
     languageOptions: {
@@ -11,9 +11,9 @@ module.exports = [
         require: 'readonly',
         module: 'readonly',
         exports: 'writable',
-        ...js.configs.recommended.languageOptions?.globals,
+        ...configs.recommended.languageOptions?.globals,
       },
-      sourceType: 'commonjs',
+      sourceType: 'module',
       ecmaVersion: 'latest',
     },
     plugins: {
