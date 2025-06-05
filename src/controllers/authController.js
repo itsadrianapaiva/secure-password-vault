@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.js';
 import { generateToken } from '../utils/generateToken.js';
 
-export const registerUser = async (req, res) => {
+export const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
@@ -12,61 +12,51 @@ export const registerUser = async (req, res) => {
     }
 
     //2.Check if user exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(409).json({ error: 'Email already registered' });
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      res.status(400);
+      throw new Error('User already exists');
     }
 
     //3.Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     //4.Create and save new user
-    const newUser = new User({
-      name,
-      email,
-      password: hashedPassword,
-    });
-    await newUser.save();
+    const user = await User.create({ name, email, password: hashedPassword });
 
-    //5.Respond with success
-    res.status(201).json({ message: 'User registered successfully' });
+    //5.Respond with success and generate token
+    res.status(201).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id),
+      message: 'User registered successfully',
+    });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ error: 'Server error' });
+    next(error); // Pass error to the error handler middleware
   }
 };
 
-export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
+export const loginUser = async (req, res, next) => {
   try {
-    //1. Check if user exists
+    const { email, password } = req.body;
+
+    //1. Check if user exists & password matches
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      res.status(401);
+      throw new Error('Invalid email or password');
     }
 
-    //2. Check if password matches
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Password incorrect' });
-    }
-
-    //3. Generate JWT token
-    const token = generateToken(user._id);
-
-    //4. Respond with token and user info
+    //2. Respond with token and user info
     res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: generateToken(user._id),
       message: 'Login successful',
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
     });
   } catch (error) {
-    console.error('Error during login:', error);
-    res.status(500).json({ error: 'Server error' });
+    next(error);
   }
 };
