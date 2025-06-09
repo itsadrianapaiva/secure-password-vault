@@ -60,3 +60,9 @@ export const loginUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const logoutUser = (req, res, next) => {
+  //if using httpOnly cookies, we'd clear them like:
+  //res.clearCookie('token')
+  res.status(200).json({ message: 'User logged out successfully' });
+}

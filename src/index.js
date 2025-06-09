@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import passwordRoutes from './routes/passwordRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(cors()); //allow cross-origin requests
 
 //Routes
 app.use('/api/v1', authRoutes);
+app.use('/api/v1/passwords', passwordRoutes)
 
 app.use(errorHandler);
 

@@ -13,7 +13,7 @@ export const createPassword = async (req, res, next) => {
       user: req.user._id, //from auth middleware
     });
 
-    res.statys(201).json(newPassword);
+    res.status(201).json(newPassword);
   } catch (error) {
     next(error);
   }
