@@ -6,7 +6,6 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import passwordRoutes from './routes/passwordRoutes.js';
 import { errorHandler } from './middleware/errorMiddleware.js';
-import { apiLimiter } from './middleware/rateLimiter.js';
 
 const app = express();
 
@@ -19,7 +18,6 @@ app.use('/api/v1', authRoutes);
 app.use('/api/v1/passwords', passwordRoutes);
 
 app.use(errorHandler);
-app.use(apiLimiter);
 
 app.get('/', (req, res) => {
   res.send('Password Vault API is running');

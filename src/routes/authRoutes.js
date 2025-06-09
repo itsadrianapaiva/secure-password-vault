@@ -5,14 +5,19 @@ import {
   registerUser,
 } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
+import { validate } from '../middleware/validate.js';
+import { registerValidation, loginValidation } from '../validators/authValidators.js';
+import { authRateLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
+//Validation => error check => controller
+
 //POST /api/v1/register
-router.post('/register', registerUser);
+router.post('/register',authRateLimiter, registerValidation, validate, registerUser);
 
 //POST /api/v1/login
-router.post('/login', loginUser);
+router.post('/login', authRateLimiter, loginValidation, validate, loginUser);
 
 //POST /api/v1/logout
 router.post('/logout', logoutUser);
